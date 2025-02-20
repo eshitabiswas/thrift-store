@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Card from './Card';
 import './App.css';
+import axios from "axios";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -8,28 +9,46 @@ function App() {
   const [error, setError] = useState('');
   const [showProducts, setShowProducts] = useState(false);
 
-  const fetchProducts = () => {
-    setLoading(true);
-    setError('');
+  // const fetchProducts = () => {
+  //   setLoading(true);
+  //   setError('');
 
-    fetch('https://dummyjson.com/products')
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setProducts(data.products);
-        setLoading(false);
+  //   fetch('https://dummyjson.com/products')
+  //     .then((res) => {
+  //       if (!res.ok) {
+  //         throw new Error(`HTTP error! Status: ${res.status}`);
+  //       }
+  //       return res.json();
+  //     })
+  //     .then((data) => {
+  //       setProducts(data.products);
+  //       setLoading(false);
+  //       setShowProducts(true);
+  //     })
+  //     .catch((err) => {
+  //       setError('Failed to load products.');
+  //       console.error(err);
+  //       setLoading(false);
+  //     });
+  // };
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const res = await axios.get('https://dummyjson.com/products')
+      console.log(res)
+      if (res?.status === 200) {
+        setProducts(res?.data?.products)
         setShowProducts(true);
-      })
-      .catch((err) => {
-        setError('Failed to load products.');
-        console.error(err);
-        setLoading(false);
-      });
-  };
+      }
+      
+    } catch (ex) {
+      console.log(ex)
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="App">
@@ -48,6 +67,7 @@ function App() {
       {showProducts && (
         <div className="product-grid">
           {products.map((product) => (
+            // console.log(product,'product'),
             <Card key={product.id} product={product} />
           ))}
         </div>
